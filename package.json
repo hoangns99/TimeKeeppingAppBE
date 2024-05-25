@@ -1,0 +1,19 @@
+{
+  "name": "TimeKeepingAppBE",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "msnodesqlv8": "^4.2.1",
+    "mssql": "^10.0.2",
+    "ngrok": "^5.0.0-beta.2",
+    "nodemon": "^3.1.0",
+    "uuid": "^9.0.1"
+  }
+}
