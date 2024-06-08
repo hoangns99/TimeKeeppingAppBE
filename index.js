@@ -1,11 +1,14 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var cors = require('cors');
-var app = express();
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const app = express();
+
+dotenv.config();
 app.use(bodyParser.json());
 app.use(cors());
 
-const port = 3000;
+const port = process.env.PORT;
 
 // các route
 
