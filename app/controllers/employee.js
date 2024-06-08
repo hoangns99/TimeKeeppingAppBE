@@ -1,18 +1,73 @@
-const employeeModel = require('../models/employee')
+const employeeModel = require('../models/employee');
+// const bcrypt = require('bcrypt')
+// const jwt = require('jsonwebtoken')
+
+//Generate Access Token
+// const generateAccessToken = (result) => {
+//     return jwt.sign({
+//         fullname: result.FULLNAME,
+//         tolv: result.TOLV
+//     },
+//     process.env.JWT_ACCESS_KEY,
+//     {expiresIn: "30s"})
+// }
+
+//Generate Refresh Token
+// const generateRefreshToken = (result) => {
+//     return jwt.sign({
+//         fullname: result.FULLNAME,
+//         tolv: result.TOLV
+//     },
+//     process.env.JWT_REFRESH_KEY,
+//     {expiresIn: "365d"})
+// }
 
 const Login = async (req, res) => {
     const user = req.body;
     try {
       const result = await employeeModel.Login(user);
-      if(result) {
-        res.status(200).json({message: "Đăng nhập thành công", result});
-        console.log("Đăng nhập thành công");
-      } else {
-        res.status(401).json({error: "Sai tên đăng nhập hoặc mật khẩu"});
-        console.log("Sai tên đăng nhập hoặc mật khẩu");
-      }  
+
+      //kiểm tra mật khẩu mã hóa và mật khẩu người dùng nhập có giống nhau không
+    //   const validPassword = await bcrypt.compare(user.PASS, result.PASS)
+
+      if(!result) {
+        res.status(401).json({message:'Đăng nhập thất bại. Không tìm thấy tên người dùng!'})
+      }
+
+      if(result.PASS !== user.PASS) {
+        res.status(401).json({message:'Sai mật khẩu!'})
+      }
+
+      if(result.THIETBI !== user.THIETBI){
+        res.status(401).json({message:'Thiết bị không hợp lệ!'})
+      }
+
+    //   if(result.THIETBI != user.THIETBI) {
+    //     res.status(401).json({message:'Thiết bị không hợp lệ'})
+    //   }
+
+      // Đăng nhập khi không sử dụng jwt để xác thực
+    //   if(result.USERNAME && validPassword && result.THIETBI) {
+    //     const {PASS, ...others} = result;
+    //     res.status(200).json({message:"Đăng nhập thành công", ...others})
+    //   }
+
+      if(result.USERNAME && result.PASS == user.PASS && result.THIETBI == user.THIETBI) {
+        const {PASS, ...others} = result;
+        res.status(200).json({message:"Đăng nhập thành công", ...others})
+      }
+
+    // Đăng nhập khi sử dụng jwt
+    //   if(result.USERNAME && validPassword && result.THIETBI) {
+    //     const accessToken = generateAccessToken(result);
+    //     const refreshToken = generateRefreshToken(result);
+
+    //     const {PASS, ...others} = result;
+    //     res.status(200).json({message: "Đăng nhập thành công", ...others, accessToken, refreshToken})
+    //   }
+
     } catch (error) {
-        res.status(500).json({error: "Lỗi khi đăng nhập"});
+        res.status(500).json({message: "Đăng nhập không thành công. Vui lòng kiểm tra lại tên đăng nhập hoặc mật khẩu!"});
         console.log("Lỗi khi đăng nhập");
     }
 }
@@ -41,10 +96,19 @@ const getById = async (req, res) => {
 }
 
 const addNew = async (req, res) => {
-    const newEmployee = req.body;
     try {
+        //Tạo mật khẩu mã hóa
+        // const salt = await bcrypt.genSalt(10);
+        // const hashed = await bcrypt.hash(req.body.PASS, salt);
+        const newEmployee = {
+            USERNAME: req.body.USERNAME,
+            FULLNAME: req.body.FULLNAME,
+            TOLV: req.body.TOLV,
+            PASS: req.body.PASS,
+            THIETBI: req.body.THIETBI
+        };
         employeeModel.addNew(newEmployee);
-        res.status(200).json({message:"Thêm nhân viên thành công"});
+        res.status(200).json({message:"Thêm nhân viên thành công", newEmployee});
     } catch (error) {
         res.status(500).json({error: "Lỗi khi thêm nhân viên"});
     }

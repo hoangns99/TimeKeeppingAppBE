@@ -10,9 +10,9 @@ const getList = async (req, res) => {
 }
 
 const getById = async (req, res) => {
-    const { ID_NV, TRX_DATE } = req.query;
+    const { TEN_NV, TRX_DATE } = req.query;
     try {
-        const timekeepingInfo = await timekeepingModel.getById(ID_NV,TRX_DATE);
+        const timekeepingInfo = await timekeepingModel.getById(TEN_NV, TRX_DATE);
         console.log(Object.entries(timekeepingInfo).length);
         if(Object.entries(timekeepingInfo).length == 0) {
             res.status(200).json({message: "Chưa có thông tin chấm công", timekeepingInfo});

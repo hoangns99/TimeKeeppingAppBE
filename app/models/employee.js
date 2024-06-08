@@ -1,10 +1,12 @@
-const  {conn} = require('../../databaseConfig');
+const  {conn, sql} = require('../../databaseConfig');
+const { v4: uuidv4 } = require('uuid');
 
 const Login = async (user) => {
     try {
         const pool = await conn;
-        const sqlQuery = `Select top 1 ID, NAME, TOLV, THIETBI From NHANVIEN Where ID = ${user.ID} and PASS = ${user.PASS} `;
-        const result = await pool.request().query(sqlQuery);
+        const result = await pool.request()
+        .input('USERNAME', sql.NVarChar, user.USERNAME)
+        .query('Select * From NHANVIEN Where USERNAME = @USERNAME');
         return result.recordset[0];
     } catch (error) {
         console.log(error);
@@ -25,7 +27,7 @@ const getList = async () => {
 const getById = async (id) => {
     try {
         const pool = await conn;
-        const sqlQuery = `Select * From NHANVIEN Where ID = ${id}`;
+        const sqlQuery = `Select ID, NAME, TOLV, THIETBI From NHANVIEN Where ID = ${id}`;
         const result = await pool.request().query(sqlQuery);
         return result.recordset[0];
     } catch (error) {
@@ -36,8 +38,14 @@ const getById = async (id) => {
 const addNew = async (employee) => {
     try {
         const pool = await conn;
-        const sqlQuery = `INSERT INTO NHANVIEN (ID, NAME, TOLV, PASS) VALUES('${employee.ID}',N'${employee.NAME}',N'${employee.TOLV}','${employee.PASS}')`;
-        return await pool.request().query(sqlQuery);
+        return await pool.request()
+        .input('ID', sql.NVarChar, uuidv4())
+        .input('USERNAME', sql.NVarChar, employee.USERNAME)
+        .input('FULLNAME', sql.NVarChar, employee.FULLNAME)
+        .input('TOLV', sql.NVarChar, employee.TOLV)
+        .input('PASS', sql.NVarChar, employee.PASS)
+        .input('THIETBI', sql.NVarChar, employee.THIETBI)
+        .query('INSERT INTO NHANVIEN (ID, USERNAME, FULLNAME, TOLV, PASS, THIETBI) VALUES(@ID, @USERNAME, @FULLNAME, @TOLV, @PASS, @THIETBI)')
     } catch (error) {
         console.log(error);
     }
